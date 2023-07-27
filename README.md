@@ -112,14 +112,14 @@ const crypto = require('crypto');
 const data = JSON.stringify({
     foo: 'bar'
   }),
-  path = '/ok',
-  method = 'POST';
+  path = '/jsonplaceholder/posts',
+  method = 'GET';
 
 // process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 const url = 'localhost',
   username = 'hmac-user',
-  secret = 'secret_value',
+  secret = 'secret-value',
   uuid = '9b83f786-5a70-11eb-ae93-0242ac130002',
   algorithm = 'hmac-sha256';
 
@@ -138,8 +138,39 @@ console.log('variables:\n',
   'signingString:', signingString, '\n',
   'signature:', signature, '\n',
   'authorization:', authorization);
+
 ```
+<br> Remember to change value **data**, **url**, **username**, **secret**, **uuid** and **algorithm**
 <br> Run `node index.js`
+
+```
+$ node index.js
+variables:
+ url: localhost
+ username: hmac-user
+ secret: secret-value
+ body: {"foo":"bar"}
+ signingString: date: Thu, 27 Jul 2023 05:16:22 GMT
+GET /jsonplaceholder/posts HTTP/1.1
+ signature: 1vxTZASbsHA23kvRa2oPuhsVFLAG10xu5ccu4Rlxovs=
+ authorization: hmac username="hmac-user", algorithm="hmac-sha256", headers="date request-line", signature="1vxTZASbsHA23kvRa2oPuhsVFLAG10xu5ccu4Rlxovs="
+```
+Put data and authorization in the header of request
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/d60fa7d2-14cd-45d5-8291-0726cd232eb5)
+
+## JWT Authentication
+Add JWT authentication at route 
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/3f2d5c0f-82ab-45ea-adb2-f6bcdd990371)
+
+Add JWT authentication in consumer credential
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/48572c41-4ed6-4553-ba69-4f0d36bb71f6)
+
+And run test in postman
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/3c7ee3a8-791e-47ca-84fc-007612a490e1)
+
+
+
+
 
 
 

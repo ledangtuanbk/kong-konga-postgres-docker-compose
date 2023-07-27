@@ -1,7 +1,7 @@
 # kong-konga-postgres-docker-compose
 Docker compose for Kong, Konga, using Postgres database
 
-# how to use
+# 1. How to use
 Precondition: Install docker and docker-compose on the server
 
 `
@@ -12,7 +12,7 @@ docker-compose up -d
 <br>konga run in port 1337<br/>
 <br>postgres: 5432<br/>
 
-# How to run
+# 2. How to run
 If we run in local host: replace SERVER_IP with localhost
 <br>Access to konga usign this
 `
@@ -28,26 +28,26 @@ http://SERVER_IP:1337/
 
 Now we have connected KongA to Kong.
 
-# Configure Services, Route
-## Create Services
+# 3. Configure Services, Route
+## 3.1. Create Services
 <br>We only need to enter the name and URL of service that we will redirect from Kong
 
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/6c6dc407-c24f-4de7-b930-2b2f65a7de7e)
 
-## Create Route to service 
+## 3.2. Create Route to service 
 <br>In this case we want to route the path **/jsonplaceholder** to service jsonplaceholder
 
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/6d6d54d7-c0d2-4a9c-b653-060b3a161c42)
 
-## Test after route
+### Test after route
 The origin `https://jsonplaceholder.typicode.com/posts`
 <br>Then after we using API gateway `http://SERVER_IP:8000/jsonplaceholder/posts`
 
 We can see, they work the same. It means that API gateway worked as we expected.
 
-# Authentication with API gateway
+# 4. Authentication with API gateway
 We can add an authentication plugin at services or routes. I will guide you to add in the route level.
-## Basic authentication
+## 4.1. Basic authentication
 <br>From route -> plugins -> add -> basic authentication
 
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/51a5c0e8-876a-4120-8269-758d197e1520)
@@ -76,7 +76,7 @@ We can add an authentication plugin at services or routes. I will guide you to a
 <br> base64("tommy:123456") =dG9tbXk6MTIzNDU2
 <br> Authenication: Basic dG9tbXk6MTIzNDU2
 
-## Key authentication
+## 4.2. Key authentication
 <br>Create a key authentication in the route
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/2018fe4d-dcff-4926-918e-b6e2b0e6ee5d)
 
@@ -89,7 +89,7 @@ We can add it in Postman to check
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/2dcd0ef7-6b49-4357-9610-a15e6ea6e3ea)
 
 
-## HMAC Authentication
+## 4.3. HMAC Authentication
 <br> Create an HMAC authentication in the route
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/ff74770a-464f-4133-ba1e-e744a7d038a8)
 
@@ -136,7 +136,7 @@ Open the console, we can see the added headers<br>
 Put data and authorization in the header of the request
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/d60fa7d2-14cd-45d5-8291-0726cd232eb5)
 
-## JWT Authentication
+## 4.4. JWT Authentication
 Add JWT authentication at the route 
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/3f2d5c0f-82ab-45ea-adb2-f6bcdd990371)
 
@@ -146,10 +146,6 @@ Add JWT authentication in consumer credential
 And run the test in Postman
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/3c7ee3a8-791e-47ca-84fc-007612a490e1)
 
+It should work for you. 
 
-
-
-
-
-
-
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/ledangtuanbk)

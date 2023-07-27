@@ -46,5 +46,101 @@ The origin `https://jsonplaceholder.typicode.com/posts`
 We can see, they work the same. It means that API gateway worked as we expected.
 
 # Authentication with API gateway
+We can add an authentication plugin at services or routes. I will guide you to add in the route level.
+## Basic authentication
+<br>From route -> plugins -> add -> basic authentication
+
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/51a5c0e8-876a-4120-8269-758d197e1520)
+
+<br> Create a new consumer to handle basic authentication, 
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/f6478524-a42b-4f10-8c77-eb27458012a1)
+
+<br> Create a basic authentication credential 
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/cf830748-d048-486d-ab52-5842fb39803c)
+
+### Test it
+<br>If we don't provide any credentials, there is an error like this. 
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/26e06d78-fe5c-459f-8612-215f393ed66f)
+
+<br>We can use Postman to create a credential for us
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/93b5bfd3-7c4e-4295-ae32-3b05f65865e3)
+
+<br> It will auto add authentication header for us
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/e5b5e00a-9bd6-4c0d-a471-90054d30355e)
+
+<br>We also can manually add it. the structure is easy 
+<br>the value = `Basic base64(username:password)`
+<br>we can get base64 online https://www.base64encode.org/
+<br>For example: username: **tommy**, password: **123456**
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/ae41aa85-802d-4e6b-82cf-a1985f4ae1e9)
+<br> base64("tommy:123456") =dG9tbXk6MTIzNDU2
+<br> Authenication: Basic dG9tbXk6MTIzNDU2
+
+## Key authentication
+<br>Create a key authentication in route
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/2018fe4d-dcff-4926-918e-b6e2b0e6ee5d)
+
+<br> Go to Consumer, create a key authentication credential.
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/b9ea5423-144e-45f6-a62b-584fd6f1cb4f)
+
+We can add it in postman to check
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/7ffaea46-eca7-493c-b327-5af7b606c2a7)
+<br>
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/2dcd0ef7-6b49-4357-9610-a15e6ea6e3ea)
+
+
+## HMAC Authentication
+<br> Create a HMAC authentication in route
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/ff74770a-464f-4133-ba1e-e744a7d038a8)
+
+<br> Create a HMAC credential in consumer
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/ceeb7063-cce1-4b0e-bea2-4dbb1522ba0e)
+
+To used HMAC credential, it is more complicated than 2 above ones
+we can follow guides 
+<br>https://ranggasama.medium.com/hmac-authentication-using-kong-api-gateway-e6d3020fa1f9
+<br>https://docs.konghq.com/hub/kong-inc/hmac-auth/
+
+Use nodejs to calculate `date` and `authorization` value
+
+save file as nodejs.index
+```
+const https = require('https');
+const fs = require('fs');
+const crypto = require('crypto');
+
+const data = JSON.stringify({
+    foo: 'bar'
+  }),
+  path = '/ok',
+  method = 'POST';
+
+// process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+
+const url = 'localhost',
+  username = 'hmac-user',
+  secret = 'secret_value',
+  uuid = '9b83f786-5a70-11eb-ae93-0242ac130002',
+  algorithm = 'hmac-sha256';
+
+let authorization, digestBodyHeader, dateFormat, signingString, signature;
+
+dateFormat = new Date().toUTCString();
+signingString = 'date: ' + dateFormat + '\n' + method + ' ' + path + ' HTTP/1.1';
+signature = crypto.createHmac('sha256', secret).update(signingString).digest('base64');
+authorization = 'hmac username="' + username + '", algorithm="' + algorithm + '", headers="date request-line", signature="' + signature + '"';
+
+console.log('variables:\n',
+  'url:', url, '\n',
+  'username:', username, '\n',
+  'secret:', secret, '\n',
+  'body:', data, '\n',
+  'signingString:', signingString, '\n',
+  'signature:', signature, '\n',
+  'authorization:', authorization);
+```
+<br> Run `node index.js`
+
+
 
 

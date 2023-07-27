@@ -77,95 +77,73 @@ We can add an authentication plugin at services or routes. I will guide you to a
 <br> Authenication: Basic dG9tbXk6MTIzNDU2
 
 ## Key authentication
-<br>Create a key authentication in route
+<br>Create a key authentication in the route
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/2018fe4d-dcff-4926-918e-b6e2b0e6ee5d)
 
-<br> Go to Consumer, create a key authentication credential.
+<br> Go to Consumer, and create a key authentication credential.
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/b9ea5423-144e-45f6-a62b-584fd6f1cb4f)
 
-We can add it in postman to check
+We can add it in Postman to check
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/7ffaea46-eca7-493c-b327-5af7b606c2a7)
 <br>
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/2dcd0ef7-6b49-4357-9610-a15e6ea6e3ea)
 
 
 ## HMAC Authentication
-<br> Create a HMAC authentication in route
+<br> Create an HMAC authentication in the route
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/ff74770a-464f-4133-ba1e-e744a7d038a8)
 
-<br> Create a HMAC credential in consumer
+<br> Create an HMAC credential in the consumer
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/ceeb7063-cce1-4b0e-bea2-4dbb1522ba0e)
 
-To used HMAC credential, it is more complicated than 2 above ones
-we can follow guides 
+Using HMAC credentials, is more complicated than 2 above ones
+we can follow the guides 
 <br>https://ranggasama.medium.com/hmac-authentication-using-kong-api-gateway-e6d3020fa1f9
 <br>https://docs.konghq.com/hub/kong-inc/hmac-auth/
 
-Use nodejs to calculate `date` and `authorization` value
-
-save file as nodejs.index
+Use javascript to calculate `date` and `authorization` values in pre-request script of Postman
 ```
-const https = require('https');
-const fs = require('fs');
-const crypto = require('crypto');
-
-const data = JSON.stringify({
-    foo: 'bar'
-  }),
-  path = '/jsonplaceholder/posts',
-  method = 'GET';
-
-// process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
-
-const url = 'localhost',
-  username = 'hmac-user',
-  secret = 'secret-value',
-  uuid = '9b83f786-5a70-11eb-ae93-0242ac130002',
-  algorithm = 'hmac-sha256';
-
-let authorization, digestBodyHeader, dateFormat, signingString, signature;
-
-dateFormat = new Date().toUTCString();
-signingString = 'date: ' + dateFormat + '\n' + method + ' ' + path + ' HTTP/1.1';
-signature = crypto.createHmac('sha256', secret).update(signingString).digest('base64');
+const path = '/jsonplaceholder/posts';
+const username = 'hmac-user';
+const algorithm = 'hmac-sha256';
+const method = 'GET';
+const secret = 'secret-value';
+var dateFormat = new Date().toUTCString();
+pm.request.headers.add({
+    key: 'date',
+    value: dateFormat
+})
+var signingString = 'date: ' + dateFormat + '\n' + method + ' ' + path + ' HTTP/1.1';
+var sha256 = CryptoJS.HmacSHA256(signingString, secret);
+var signature = CryptoJS.enc.Base64.stringify(sha256);
+console.log('signingString ' + signingString);
+console.log('signature ' + signature);
 authorization = 'hmac username="' + username + '", algorithm="' + algorithm + '", headers="date request-line", signature="' + signature + '"';
-
-console.log('variables:\n',
-  'url:', url, '\n',
-  'username:', username, '\n',
-  'secret:', secret, '\n',
-  'body:', data, '\n',
-  'signingString:', signingString, '\n',
-  'signature:', signature, '\n',
-  'authorization:', authorization);
-
+pm.request.headers.add({
+    key: 'authorization',
+    value: authorization
+})
 ```
+It autos add 2 headers data and authorization to header request<br>
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/98cc177c-4c5f-4289-b29d-377f2f536a88)
+Open the console, we can see the added headers<br>
+![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/0403bc09-a085-4b0d-abe2-525c3395c31c)
+
+
 <br> Remember to change value **data**, **url**, **username**, **secret**, **uuid** and **algorithm**
 <br> Run `node index.js`
 
-```
-$ node index.js
-variables:
- url: localhost
- username: hmac-user
- secret: secret-value
- body: {"foo":"bar"}
- signingString: date: Thu, 27 Jul 2023 05:16:22 GMT
-GET /jsonplaceholder/posts HTTP/1.1
- signature: 1vxTZASbsHA23kvRa2oPuhsVFLAG10xu5ccu4Rlxovs=
- authorization: hmac username="hmac-user", algorithm="hmac-sha256", headers="date request-line", signature="1vxTZASbsHA23kvRa2oPuhsVFLAG10xu5ccu4Rlxovs="
-```
-Put data and authorization in the header of request
+Put data and authorization in the header of the request
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/d60fa7d2-14cd-45d5-8291-0726cd232eb5)
 
 ## JWT Authentication
-Add JWT authentication at route 
+Add JWT authentication at the route 
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/3f2d5c0f-82ab-45ea-adb2-f6bcdd990371)
 
 Add JWT authentication in consumer credential
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/48572c41-4ed6-4553-ba69-4f0d36bb71f6)
 
-And run test in postman
+And run the test in Postman
 ![image](https://github.com/ledangtuanbk/kong-konga-postgres-docker-compose/assets/5629901/3c7ee3a8-791e-47ca-84fc-007612a490e1)
 
 
